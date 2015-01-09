@@ -13,8 +13,19 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    dataprovider.cpp \
+    phonerecord.cpp \
+    recorddialog.cpp \
+    csvdataprovider.cpp \
+    finder.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    dataprovider.h \
+    phonerecord.h \
+    recorddialog.h \
+    csvdataprovider.h \
+    finder.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    recorddialog.ui
