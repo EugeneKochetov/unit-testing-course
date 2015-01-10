@@ -3,6 +3,20 @@
 #include <QCoreApplication>
 #include "recorddialog.h"
 #include "phonerecord.h"
+#include "dataprovider.h"
+
+// DataProvider class for tests
+class DataProviderStub : public DataProvider
+{
+    // DataProvider interface
+public:
+    virtual void open() {};
+    virtual void close() {};
+    virtual void addPhoneRecord(PhoneRecord &record) {};
+    virtual void savePhoneRecord(PhoneRecord &record) {};
+    virtual void deletePhoneRecord(PhoneRecord &record) {};
+    virtual Finder *getFinder() { return NULL; };
+};
 
 class RecordDialogTest : public QObject
 {
@@ -14,7 +28,11 @@ public:
 private Q_SLOTS:
     void initTestCase();
     void cleanupTestCase();
-    void testConstructor();
+    void testConstructorWithNull();
+    void testConstructorWithNewRecord();
+
+private:
+    DataProviderStub *dataProvider;
 };
 
 RecordDialogTest::RecordDialogTest()
@@ -23,16 +41,27 @@ RecordDialogTest::RecordDialogTest()
 
 void RecordDialogTest::initTestCase()
 {
+    dataProvider = new DataProviderStub();
 }
 
 void RecordDialogTest::cleanupTestCase()
 {
+    delete dataProvider;
 }
 
-void RecordDialogTest::testConstructor()
+void RecordDialogTest::testConstructorWithNull()
 {
-    RecordDialog *rd = new RecordDialog(NULL);
+    RecordDialog *rd;
+    QVERIFY_EXCEPTION_THROWN(rd = new RecordDialog(NULL), std::invalid_argument);
+}
+
+void RecordDialogTest::testConstructorWithNewRecord()
+{
+    PhoneRecord *record = dataProvider->getNewPhoneRecord();
+    RecordDialog *rd = new RecordDialog(record);
+    QCOMPARE(rd->record(), record);
     delete rd;
+    delete record;
 }
 
 QTEST_MAIN(RecordDialogTest)

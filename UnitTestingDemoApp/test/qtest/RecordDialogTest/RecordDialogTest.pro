@@ -24,8 +24,12 @@ VPATH += $${PWD} \
 SOURCES += tst_recorddialogtest.cpp
 
 # Main app dependencies
-SOURCES += recorddialog.cpp
-HEADERS += recorddialog.h
+SOURCES += recorddialog.cpp \
+    phonerecord.cpp \
+    dataprovider.cpp
+HEADERS += recorddialog.h \
+    phonerecord.h \
+    dataprovider.h
 FORMS += recorddialog.ui
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
