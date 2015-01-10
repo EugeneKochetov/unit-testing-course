@@ -40,6 +40,8 @@ private Q_SLOTS:
     void testConstructorWithNull();
     void testConstructorWithNewRecord();
     void testUiFieldsWithNewRecord();
+    void testUiFieldsWithRecord_data();
+    void testUiFieldsWithRecord();
 
 private:
     DataProviderStub *dataProvider;
@@ -81,6 +83,33 @@ void RecordDialogTest::testUiFieldsWithNewRecord()
     QCOMPARE(rd->getUi()->leFirstName->text(), QString(""));
     QCOMPARE(rd->getUi()->leLastName->text(), QString(""));
     QCOMPARE(rd->getUi()->lePhone->text(), QString(""));
+    delete rd;
+    delete record;
+}
+
+void RecordDialogTest::testUiFieldsWithRecord_data()
+{
+    QTest::addColumn<QString>("firstName");
+    QTest::addColumn<QString>("lastName");
+    QTest::addColumn<QString>("phone");
+
+    QTest::newRow("all empty") << "" << "" << "";
+    QTest::newRow("all non empty") << "John" << "Lock" << "4815162342";
+}
+
+void RecordDialogTest::testUiFieldsWithRecord()
+{
+    QFETCH(QString, firstName);
+    QFETCH(QString, lastName);
+    QFETCH(QString, phone);
+    PhoneRecord *record = new PhoneRecord(*dataProvider,
+                                          firstName.toStdString(),
+                                          lastName.toStdString(),
+                                          phone.toStdString());
+    RecordDialogForUiTest *rd = new RecordDialogForUiTest(record);
+    QCOMPARE(rd->getUi()->leFirstName->text(), firstName);
+    QCOMPARE(rd->getUi()->leLastName->text(), lastName);
+    QCOMPARE(rd->getUi()->lePhone->text(), phone);
     delete rd;
     delete record;
 }
