@@ -1,6 +1,8 @@
 #include <QString>
 #include <QtTest>
 #include <QCoreApplication>
+#include "recorddialog.h"
+#include "phonerecord.h"
 
 class RecordDialogTest : public QObject
 {
@@ -12,8 +14,7 @@ public:
 private Q_SLOTS:
     void initTestCase();
     void cleanupTestCase();
-    void testCase1_data();
-    void testCase1();
+    void testConstructor();
 };
 
 RecordDialogTest::RecordDialogTest()
@@ -28,16 +29,10 @@ void RecordDialogTest::cleanupTestCase()
 {
 }
 
-void RecordDialogTest::testCase1_data()
+void RecordDialogTest::testConstructor()
 {
-    QTest::addColumn<QString>("data");
-    QTest::newRow("0") << QString();
-}
-
-void RecordDialogTest::testCase1()
-{
-    QFETCH(QString, data);
-    QVERIFY2(true, "Failure");
+    RecordDialog *rd = new RecordDialog(NULL);
+    delete rd;
 }
 
 QTEST_MAIN(RecordDialogTest)
