@@ -1,6 +1,7 @@
 #include "csvdataprovider.h"
 #include <fstream>
 #include <QtDebug>
+#include "csvparser.h"
 
 CsvDataProvider::CsvDataProvider(string fileName) :
     _fileName(fileName),
@@ -30,28 +31,16 @@ void CsvDataProvider::open()
         getline(input, line);
         qDebug() << "Read line: \"" << line.c_str() << "\"";
 
-        string firstName;
-        string lastName;
-        string phone;
+        vector<string> fields;
+        csvParseLine(line, fields);
 
-        size_t startPos = 0;
-        size_t commaPos = line.find_first_of(',', startPos);
-        if (string::npos == commaPos) continue;
-        firstName = line.substr(startPos, commaPos - startPos);
+        if (fields.size() < 3) continue;
 
-        startPos = commaPos + 1;
-        commaPos = line.find_first_of(',', startPos);
-        if (string::npos == commaPos) continue;
-        lastName = line.substr(startPos, commaPos - startPos);
+        _records.push_back(PhoneRecord(*this, fields[0], fields[1], fields[2]));
 
-        startPos = commaPos + 1;
-        phone = line.substr(startPos);
-
-        _records.push_back(PhoneRecord(*this, firstName, lastName, phone));
-
-        qDebug() << "Added record: " << firstName.c_str() << ", "
-                 << lastName.c_str() << ", "
-                 << phone.c_str();
+        qDebug() << "Added record: " << fields[0].c_str() << ", "
+                 << fields[1].c_str() << ", "
+                 << fields[2].c_str();
     }
     input.close();
 }
@@ -63,7 +52,11 @@ void CsvDataProvider::close()
 
     for (list<PhoneRecord>::const_iterator it = _records.begin(); it != _records.end(); ++it)
     {
-        output << it->getFirstName() << "," << it->getLastName() << "," << it->getPhone() << endl;
+        vector<string> fields;
+        fields.push_back(it->getFirstName());
+        fields.push_back(it->getLastName());
+        fields.push_back(it->getPhone());
+        output << csvEncodeLine(fields) << endl;
     }
     output.close();
 }

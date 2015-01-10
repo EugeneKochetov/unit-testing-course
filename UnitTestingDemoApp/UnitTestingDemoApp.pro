@@ -18,14 +18,16 @@ SOURCES += main.cpp\
     phonerecord.cpp \
     recorddialog.cpp \
     csvdataprovider.cpp \
-    finder.cpp
+    finder.cpp \
+    csvparser.cpp
 
 HEADERS  += mainwindow.h \
     dataprovider.h \
     phonerecord.h \
     recorddialog.h \
     csvdataprovider.h \
-    finder.h
+    finder.h \
+    csvparser.h
 
 FORMS    += mainwindow.ui \
     recorddialog.ui
