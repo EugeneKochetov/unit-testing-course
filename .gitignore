@@ -1,6 +1,6 @@
 UnitTestingDemoApp/UnitTestingDemoApp.pro.user
 *~
-UnitTestingDemoApp/build-UnitTestingDemoApp-Desktop_Qt_5_4_0_GCC_32bit-Debug
-UnitTestingDemoApp/build-UnitTestingDemoApp-Desktop_Qt_5_4_0_GCC_32bit-Release
+UnitTestingDemoApp/build
+UnitTestingDemoApp/build
 UnitTestingDemoApp/test/gtest-build
 UnitTestingDemoApp/test/unit/csvparsertest
