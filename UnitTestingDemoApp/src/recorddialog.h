@@ -18,8 +18,9 @@ public:
     ~RecordDialog();
 
     PhoneRecord *record() const;
-private:
+protected:
     Ui::RecordDialog *ui;
+private:
     PhoneRecord* _record;
 
 private slots:
