@@ -43,12 +43,28 @@ private Q_SLOTS:
     void testUiFieldsWithRecord_data();
     void testUiFieldsWithRecord();
     void testChangeUiFieldsWithoutSubmitWithNewRecord();
+    void testChangeUiFieldsAndAcceptWithNewRecord();
+    void testChangeUiFieldsAndRejectWithNewRecord();
 
 private:
     DataProviderStub *dataProvider;
+    RecordDialogForUiTest *recordDialogForUi;
+    PhoneRecord *record;
+    const char* sampleFirstName;
+    const char* sampleLastName;
+    const char* samplePhone;
+
+    void initRecordDialogForUiWithNewRecord();
+    void releaseRecordDialogForUiWithNewRecord();
+    void clickAllFields(RecordDialogForUiTest *rd, const char *firstName, const char *lastName, const char *phone);
+    void verifyAllRecordFields(const PhoneRecord *record, const char *firstName, const char *lastName, const char *phone);
+    void verifyAllUiFields(RecordDialogForUiTest *rd, const char *firstName, const char *lastName, const char *phone);
 };
 
-RecordDialogTest::RecordDialogTest()
+RecordDialogTest::RecordDialogTest() :
+    sampleFirstName("John"),
+    sampleLastName("Lock"),
+    samplePhone("4815162342")
 {
 }
 
@@ -79,13 +95,9 @@ void RecordDialogTest::testConstructorWithNewRecord()
 
 void RecordDialogTest::testUiFieldsWithNewRecord()
 {
-    PhoneRecord *record = dataProvider->getNewPhoneRecord();
-    RecordDialogForUiTest *rd = new RecordDialogForUiTest(record);
-    QCOMPARE(rd->getUi()->leFirstName->text(), QString(""));
-    QCOMPARE(rd->getUi()->leLastName->text(), QString(""));
-    QCOMPARE(rd->getUi()->lePhone->text(), QString(""));
-    delete rd;
-    delete record;
+    initRecordDialogForUiWithNewRecord();
+    verifyAllUiFields(recordDialogForUi, "", "", "");
+    releaseRecordDialogForUiWithNewRecord();
 }
 
 void RecordDialogTest::testUiFieldsWithRecord_data()
@@ -95,7 +107,9 @@ void RecordDialogTest::testUiFieldsWithRecord_data()
     QTest::addColumn<QString>("phone");
 
     QTest::newRow("all empty") << "" << "" << "";
-    QTest::newRow("all non empty") << "John" << "Lock" << "4815162342";
+    QTest::newRow("all non empty") << sampleFirstName
+                                   << sampleLastName
+                                   << samplePhone;
 }
 
 void RecordDialogTest::testUiFieldsWithRecord()
@@ -108,26 +122,76 @@ void RecordDialogTest::testUiFieldsWithRecord()
                                           lastName.toStdString(),
                                           phone.toStdString());
     RecordDialogForUiTest *rd = new RecordDialogForUiTest(record);
-    QCOMPARE(rd->getUi()->leFirstName->text(), firstName);
-    QCOMPARE(rd->getUi()->leLastName->text(), lastName);
-    QCOMPARE(rd->getUi()->lePhone->text(), phone);
+    verifyAllUiFields(rd,
+                      firstName.toStdString().c_str(),
+                      lastName.toStdString().c_str(),
+                      phone.toStdString().c_str());
     delete rd;
     delete record;
 }
 
 void RecordDialogTest::testChangeUiFieldsWithoutSubmitWithNewRecord()
 {
-    PhoneRecord *record = dataProvider->getNewPhoneRecord();
-    RecordDialogForUiTest *rd = new RecordDialogForUiTest(record);
-    QTest::keyClicks(rd->getUi()->leFirstName, "John");
-    QTest::keyClicks(rd->getUi()->leLastName, "Lock");
-    QTest::keyClicks(rd->getUi()->lePhone, "4815162342");
+    initRecordDialogForUiWithNewRecord();
+    clickAllFields(recordDialogForUi, sampleFirstName, sampleLastName, samplePhone);
     // Check that record is not changed
-    QCOMPARE(rd->record()->getFirstName(), string(""));
-    QCOMPARE(rd->record()->getLastName(), string(""));
-    QCOMPARE(rd->record()->getPhone(), string(""));
-    delete rd;
+    verifyAllRecordFields(record, "", "", "");
+    releaseRecordDialogForUiWithNewRecord();
+}
+
+void RecordDialogTest::testChangeUiFieldsAndAcceptWithNewRecord()
+{
+    initRecordDialogForUiWithNewRecord();
+    clickAllFields(recordDialogForUi, sampleFirstName, sampleLastName, samplePhone);
+    QTest::mouseClick((QWidget*)recordDialogForUi->getUi()->buttonBox->button(QDialogButtonBox::Ok),
+                      Qt::LeftButton);
+    // Check that record has changed
+    verifyAllRecordFields(record, sampleFirstName, sampleLastName, samplePhone);
+    releaseRecordDialogForUiWithNewRecord();
+}
+
+void RecordDialogTest::testChangeUiFieldsAndRejectWithNewRecord()
+{
+    initRecordDialogForUiWithNewRecord();
+    clickAllFields(recordDialogForUi, sampleFirstName, sampleLastName, samplePhone);
+    QTest::mouseClick((QWidget*)recordDialogForUi->getUi()->buttonBox->button(QDialogButtonBox::Cancel),
+                      Qt::LeftButton);
+    // Check that record has changed
+    verifyAllRecordFields(record, "", "", "");
+    releaseRecordDialogForUiWithNewRecord();
+}
+
+void RecordDialogTest::initRecordDialogForUiWithNewRecord()
+{
+    record = new PhoneRecord(*dataProvider);
+    recordDialogForUi = new RecordDialogForUiTest(record);
+}
+
+void RecordDialogTest::releaseRecordDialogForUiWithNewRecord()
+{
+    delete recordDialogForUi;
     delete record;
+}
+
+void RecordDialogTest::clickAllFields(RecordDialogForUiTest *rd, const char *firstName, const char *lastName, const char *phone)
+{
+    QTest::keyClicks(rd->getUi()->leFirstName, firstName);
+    QTest::keyClicks(rd->getUi()->leLastName, lastName);
+    QTest::keyClicks(rd->getUi()->lePhone, phone);
+}
+
+void RecordDialogTest::verifyAllRecordFields(const PhoneRecord *record, const char *firstName, const char *lastName, const char *phone)
+{
+    QCOMPARE(record->getFirstName(), string(firstName));
+    QCOMPARE(record->getLastName(), string(lastName));
+    QCOMPARE(record->getPhone(), string(phone));
+}
+
+void RecordDialogTest::verifyAllUiFields(RecordDialogForUiTest *rd, const char *firstName, const char *lastName, const char *phone)
+{
+    QCOMPARE(rd->getUi()->leFirstName->text(), QString(firstName));
+    QCOMPARE(rd->getUi()->leLastName->text(), QString(lastName));
+    QCOMPARE(rd->getUi()->lePhone->text(), QString(phone));
 }
 
 QTEST_MAIN(RecordDialogTest)
