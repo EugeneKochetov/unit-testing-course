@@ -42,6 +42,7 @@ private Q_SLOTS:
     void testUiFieldsWithNewRecord();
     void testUiFieldsWithRecord_data();
     void testUiFieldsWithRecord();
+    void testChangeUiFieldsWithoutSubmitWithNewRecord();
 
 private:
     DataProviderStub *dataProvider;
@@ -110,6 +111,21 @@ void RecordDialogTest::testUiFieldsWithRecord()
     QCOMPARE(rd->getUi()->leFirstName->text(), firstName);
     QCOMPARE(rd->getUi()->leLastName->text(), lastName);
     QCOMPARE(rd->getUi()->lePhone->text(), phone);
+    delete rd;
+    delete record;
+}
+
+void RecordDialogTest::testChangeUiFieldsWithoutSubmitWithNewRecord()
+{
+    PhoneRecord *record = dataProvider->getNewPhoneRecord();
+    RecordDialogForUiTest *rd = new RecordDialogForUiTest(record);
+    QTest::keyClicks(rd->getUi()->leFirstName, "John");
+    QTest::keyClicks(rd->getUi()->leLastName, "Lock");
+    QTest::keyClicks(rd->getUi()->lePhone, "4815162342");
+    // Check that record is not changed
+    QCOMPARE(rd->record()->getFirstName(), string(""));
+    QCOMPARE(rd->record()->getLastName(), string(""));
+    QCOMPARE(rd->record()->getPhone(), string(""));
     delete rd;
     delete record;
 }
