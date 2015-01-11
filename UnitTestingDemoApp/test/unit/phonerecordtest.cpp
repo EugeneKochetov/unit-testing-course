@@ -21,3 +21,28 @@ TEST(phoneRecordTest, contructor_WithDataProviderOnly_IsNew)
     EXPECT_TRUE(record->isNew());
 }
 
+TEST(phoneRecordTest, contructor_WithDataProviderAndValues_IsNotNew)
+{
+    MockDataProvider dataProvider;
+    PhoneRecord *record = new PhoneRecord(dataProvider, "John", "Lock", "4815162342");
+    EXPECT_FALSE(record->isNew());
+}
+
+TEST(phoneRecordTest, contructor_WithDataProviderOnly_AllFieldsEmpty)
+{
+    MockDataProvider dataProvider;
+    PhoneRecord *record = new PhoneRecord(dataProvider);
+    EXPECT_EQ("", record->getFirstName());
+    EXPECT_EQ("", record->getLastName());
+    EXPECT_EQ("", record->getPhone());
+}
+
+TEST(phoneRecordTest, contructor_WithDataProviderAndValues_FieldsNotEmpty)
+{
+    MockDataProvider dataProvider;
+    PhoneRecord *record = new PhoneRecord(dataProvider, "John", "Lock", "4815162342");
+    EXPECT_EQ("John", record->getFirstName());
+    EXPECT_EQ("Lock", record->getLastName());
+    EXPECT_EQ("4815162342", record->getPhone());
+}
+
