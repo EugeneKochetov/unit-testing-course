@@ -45,6 +45,8 @@ private Q_SLOTS:
     void testChangeUiFieldsWithoutSubmitWithNewRecord();
     void testChangeUiFieldsAndAcceptWithNewRecord();
     void testChangeUiFieldsAndRejectWithNewRecord();
+    void testShowChangeUiFieldsAndAcceptWithNewRecord();
+    void testShowChangeUiFieldsAndRejectWithNewRecord();
 
 private:
     DataProviderStub *dataProvider;
@@ -156,7 +158,35 @@ void RecordDialogTest::testChangeUiFieldsAndRejectWithNewRecord()
     clickAllFields(recordDialogForUi, sampleFirstName, sampleLastName, samplePhone);
     QTest::mouseClick((QWidget*)recordDialogForUi->getUi()->buttonBox->button(QDialogButtonBox::Cancel),
                       Qt::LeftButton);
+    // Check that record has not changed
+    verifyAllRecordFields(record, "", "", "");
+    releaseRecordDialogForUiWithNewRecord();
+}
+
+void RecordDialogTest::testShowChangeUiFieldsAndAcceptWithNewRecord()
+{
+    initRecordDialogForUiWithNewRecord();
+    recordDialogForUi->show();
+    QTest::qWait(1000);
+    clickAllFields(recordDialogForUi, sampleFirstName, sampleLastName, samplePhone);
+    QTest::qWait(1000);
+    QTest::mouseClick((QWidget*)recordDialogForUi->getUi()->buttonBox->button(QDialogButtonBox::Ok),
+                      Qt::LeftButton);
     // Check that record has changed
+    verifyAllRecordFields(record, sampleFirstName, sampleLastName, samplePhone);
+    releaseRecordDialogForUiWithNewRecord();
+}
+
+void RecordDialogTest::testShowChangeUiFieldsAndRejectWithNewRecord()
+{
+    initRecordDialogForUiWithNewRecord();
+    recordDialogForUi->show();
+    QTest::qWait(1000);
+    clickAllFields(recordDialogForUi, sampleFirstName, sampleLastName, samplePhone);
+    QTest::qWait(1000);
+    QTest::mouseClick((QWidget*)recordDialogForUi->getUi()->buttonBox->button(QDialogButtonBox::Cancel),
+                      Qt::LeftButton);
+    // Check that record has not changed
     verifyAllRecordFields(record, "", "", "");
     releaseRecordDialogForUiWithNewRecord();
 }
