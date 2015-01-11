@@ -1,7 +1,9 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "phonerecord.h"
+#include <string>
 
+using namespace std;
 using ::testing::_;
 using ::testing::Ref;
 
@@ -15,6 +17,39 @@ public:
     MOCK_METHOD1(savePhoneRecord, void(PhoneRecord &record));
     MOCK_METHOD1(deletePhoneRecord, void(PhoneRecord &record));
     MOCK_METHOD0(getFinder, Finder*());
+};
+
+class PhoneRecordTestWithFixture : public ::testing::Test
+{
+public:
+    PhoneRecordTestWithFixture() :
+        notNewRecordFirstName("John"),
+        notNewRecordLastName("Lock"),
+        notNewRecordPhone("4815162342")
+    {}
+
+protected:
+    virtual void SetUp()
+    {
+        newRecord = new PhoneRecord(dataProvider);
+        notNewRecord = new PhoneRecord(dataProvider,
+                                       notNewRecordFirstName,
+                                       notNewRecordLastName,
+                                       notNewRecordPhone);
+    }
+
+    virtual void TearDown()
+    {
+        delete newRecord;
+        delete notNewRecord;
+    }
+
+    MockDataProvider dataProvider;
+    PhoneRecord *newRecord;
+    PhoneRecord *notNewRecord;
+    const string notNewRecordFirstName;
+    const string notNewRecordLastName;
+    const string notNewRecordPhone;
 };
 
 TEST(phoneRecordTest, contructor_WithDataProviderOnly_IsNew)
@@ -49,43 +84,32 @@ TEST(phoneRecordTest, contructor_WithDataProviderAndValues_FieldsNotEmpty)
     EXPECT_EQ("4815162342", record->getPhone());
 }
 
-TEST(phoneRecordTest, save_NewRecord_RecordIsNotNew)
+TEST_F(PhoneRecordTestWithFixture, save_NewRecord_RecordIsNotNew)
 {
-    MockDataProvider dataProvider;
-    PhoneRecord *record = new PhoneRecord(dataProvider);
-    record->save();
-    EXPECT_FALSE(record->isNew());
+    newRecord->save();
+    EXPECT_FALSE(newRecord->isNew());
 }
 
-TEST(phoneRecordTest, save_NewRecord_AddPhoneRecordIsCalled)
+TEST_F(PhoneRecordTestWithFixture, save_NewRecord_AddPhoneRecordIsCalled)
 {
-    MockDataProvider dataProvider;
-    PhoneRecord *record = new PhoneRecord(dataProvider);
     EXPECT_CALL(dataProvider, addPhoneRecord(_));
-    record->save();
+    newRecord->save();
 }
 
-TEST(phoneRecordTest, save_NewRecord_AddPhoneRecordIsCalledWithTestedRecord)
+TEST_F(PhoneRecordTestWithFixture, save_NewRecord_AddPhoneRecordIsCalledWithTestedRecord)
 {
-    MockDataProvider dataProvider;
-    PhoneRecord *record = new PhoneRecord(dataProvider);
-    EXPECT_CALL(dataProvider, addPhoneRecord(Ref(*record)));
-    record->save();
+    EXPECT_CALL(dataProvider, addPhoneRecord(Ref(*newRecord)));
+    newRecord->save();
 }
 
-TEST(phoneRecordTest, save_NotNewRecord_SavePhoneRecordIsCalled)
+TEST_F(PhoneRecordTestWithFixture, save_NotNewRecord_SavePhoneRecordIsCalled)
 {
-    MockDataProvider dataProvider;
-    PhoneRecord *record = new PhoneRecord(dataProvider, "John", "Lock", "4815162342");
     EXPECT_CALL(dataProvider, savePhoneRecord(_));
-    record->save();
+    notNewRecord->save();
 }
 
-TEST(phoneRecordTest, save_NotNewRecord_SavePhoneRecordIsCalledWithTestedRecord)
+TEST_F(PhoneRecordTestWithFixture, save_NotNewRecord_SavePhoneRecordIsCalledWithTestedRecord)
 {
-    MockDataProvider dataProvider;
-    PhoneRecord *record = new PhoneRecord(dataProvider, "John", "Lock", "4815162342");
-    EXPECT_CALL(dataProvider, savePhoneRecord(Ref(*record)));
-    record->save();
+    EXPECT_CALL(dataProvider, savePhoneRecord(Ref(*notNewRecord)));
+    notNewRecord->save();
 }
-
