@@ -4,3 +4,5 @@ UnitTestingDemoApp/build
 UnitTestingDemoApp/build
 UnitTestingDemoApp/test/gtest-build
 UnitTestingDemoApp/test/unit/csvparsertest
+UnitTestingDemoApp/test/gmock/make/*.o
+UnitTestingDemoApp/test/gmock/make/*.a

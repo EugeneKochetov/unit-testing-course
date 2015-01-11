@@ -56,7 +56,7 @@ GMOCK_HEADERS = $(GMOCK_DIR)/include/gmock/*.h \
 all : $(TESTS)
 
 clean :
-	rm -f $(TESTS) gmock.a gmock_main.a *.o
+	rm -f $(TESTS) libgmock.a libgmock_main.a *.o
 
 # Builds gmock.a and gmock_main.a.  These libraries contain both
 # Google Mock and Google Test.  A test should link with either gmock.a
@@ -86,10 +86,10 @@ gmock_main.o : $(GMOCK_SRCS_)
 	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) -I$(GMOCK_DIR) $(CXXFLAGS) \
             -c $(GMOCK_DIR)/src/gmock_main.cc
 
-gmock.a : gmock-all.o gtest-all.o
+libgmock.a : gmock-all.o gtest-all.o
 	$(AR) $(ARFLAGS) $@ $^
 
-gmock_main.a : gmock-all.o gtest-all.o gmock_main.o
+libgmock_main.a : gmock-all.o gtest-all.o gmock_main.o
 	$(AR) $(ARFLAGS) $@ $^
 
 # Builds a sample test.
@@ -97,5 +97,5 @@ gmock_main.a : gmock-all.o gtest-all.o gmock_main.o
 gmock_test.o : $(USER_DIR)/gmock_test.cc $(GMOCK_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/gmock_test.cc
 
-gmock_test : gmock_test.o gmock_main.a
+gmock_test : gmock_test.o libgmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
